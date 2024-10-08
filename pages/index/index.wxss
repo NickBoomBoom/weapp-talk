@@ -3,12 +3,44 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 0 20rpx;
+}
+
+.index-header {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  padding-bottom: 20rpx;
+}
+
+.index-header-btn {
+  margin-left: 20rpx;
+  background-color: skyblue;
 }
 
 .index-scroll {
   flex: 1;
   background-color: #fefefe;
 }
+
+.item {}
+
+.item-role {
+  display: inline-block;
+  width: 30rpx;
+  height: 30rpx;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.item-content {
+  display: inline;
+}
+
+.item-play {
+  display: inline;
+}
+
 
 .index-footer {
   padding-bottom: constant(safe-area-inset-bottom);
