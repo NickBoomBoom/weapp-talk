@@ -1,0 +1,12 @@
+<!--index.wxml-->
+<view class="index">
+  <scroll-view class="index-scroll">
+
+  </scroll-view>
+
+  <view class="index-footer">
+    <button bind:touchstart="handleStart" bind:touchend="handleStop">
+      {{isIng ?'录音中...':'开始录音'}}
+    </button>
+  </view>
+</view>

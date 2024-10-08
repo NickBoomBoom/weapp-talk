@@ -1,0 +1,18 @@
+/**index.wxss**/
+.index {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.index-scroll {
+  flex: 1;
+  background-color: #fefefe;
+}
+
+.index-footer {
+  padding-bottom: constant(safe-area-inset-bottom);
+  /*兼容 IOS<11.2*/
+  padding-bottom: env(safe-area-inset-bottom);
+  /*兼容 IOS>11.2*/
+}
