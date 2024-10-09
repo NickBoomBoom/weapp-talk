@@ -35,30 +35,42 @@
 
 .item {
   margin-bottom: 30rpx;
-  font-size: 28rpx;
-  line-height: 32rpx;
-  text-indent: 40rpx;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.item::before {
-  content: "";
-  position: absolute;
-  top: 0rpx;
-  left: 0;
-  display: block;
-  width: 30rpx;
-  height: 30rpx;
+.item rich-text {
+  margin: 0 10rpx;
+  font-size: 28rpx;
+  line-height: 38rpx;
+
+}
+
+.item.left {}
+
+.item.right {
+  flex-direction: row-reverse;
+}
+
+.item.right .item-role {
+  background-color: #7bed9f;
+}
+
+.item-role {
+  flex-shrink: 0;
+  width: 60rpx;
+  height: 60rpx;
   background-color: #ffc312;
   border-radius: 50%;
 }
 
+
 .item-play {
+  flex-shrink: 0;
   height: 40rpx !important;
   width: 40rpx !important;
-  position: absolute;
-  bottom: -10rpx;
-  right: 0;
+
 }
 
 .replying {
@@ -67,9 +79,15 @@
 }
 
 .index-footer {
-  height: 50rpx;
+  width: 100%;
   padding-bottom: constant(safe-area-inset-bottom);
   /*兼容 IOS<11.2*/
   padding-bottom: env(safe-area-inset-bottom);
   /*兼容 IOS>11.2*/
+}
+
+.index-footer button {
+  width: 100%;
+  background-color: #74b9ff;
+  color: white;
 }

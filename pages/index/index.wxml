@@ -6,18 +6,17 @@
     <view wx:if="{{info.sessionId}}" class="index-header-btn" bind:tap="reset">开启新对话</view>
   </view>
   <view class="index-scroll">
-    <scroll-view scroll-y class="index-scroll-inneer">
-      <view class="item" wx:for="{{list}}" wx:key="*this">
+    <scroll-view scroll-y class="index-scroll-inner" scroll-with-animation scroll-top="{{scrollTop}}">
+      <view wx:for="{{list}}" wx:key="key" class="item  {{item.type}}">
+        <view class="item-role"></view>
         <rich-text nodes="{{item.content}}">
         </rich-text>
-        <image class="item-play" src="../../images/play.png" mode="widthFix" />
+        <image wx:if="{{item.audio}}" class="item-play" src="../../images/play.png" mode="widthFix" data-item="{{item}}" bind:tap="handlePlayAudio" />
       </view>
 
       <view wx:if="{{isReplying}}" class='replying'>
         机器人正在回复...
       </view>
-
-
     </scroll-view>
   </view>
 

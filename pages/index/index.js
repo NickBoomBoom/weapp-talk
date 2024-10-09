@@ -3,7 +3,7 @@ const WEB_SOCKET_URL = 'ws://localhost:3000'
 const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cGRhdGVkX2F0IjoiMjAyNC0xMC0wOFQwNzo0NjoxMy44MDdaIiwiYWRkcmVzcyI6eyJjb3VudHJ5IjpudWxsLCJwb3N0YWxfY29kZSI6bnVsbCwicmVnaW9uIjpudWxsLCJmb3JtYXR0ZWQiOm51bGx9LCJwaG9uZV9udW1iZXJfdmVyaWZpZWQiOmZhbHNlLCJwaG9uZV9udW1iZXIiOm51bGwsImxvY2FsZSI6bnVsbCwiem9uZWluZm8iOm51bGwsImJpcnRoZGF0ZSI6bnVsbCwiZ2VuZGVyIjoiVSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJlbWFpbCI6ImNoZW5xaUBiaWdjcnVpc2UuY24iLCJ3ZWJzaXRlIjpudWxsLCJwaWN0dXJlIjoiaHR0cHM6Ly9maWxlcy5hdXRoaW5nLmNvL2F1dGhpbmctY29uc29sZS9kZWZhdWx0LXVzZXItYXZhdGFyLnBuZyIsInByb2ZpbGUiOm51bGwsInByZWZlcnJlZF91c2VybmFtZSI6bnVsbCwibmlja25hbWUiOm51bGwsIm1pZGRsZV9uYW1lIjpudWxsLCJmYW1pbHlfbmFtZSI6bnVsbCwiZ2l2ZW5fbmFtZSI6bnVsbCwibmFtZSI6bnVsbCwic3ViIjoiNjQwMDY2OGE5Zjg2NzExMGU5OGQ5NjE5IiwiZXh0ZXJuYWxfaWQiOm51bGwsInVuaW9uaWQiOm51bGwsInVzZXJuYW1lIjpudWxsLCJkYXRhIjp7InR5cGUiOiJ1c2VyIiwidXNlclBvb2xJZCI6IjYyMjgwOTk2ZWU3ZDJkMTQxNGI4NzBiMyIsImFwcElkIjoiNjIzMTUyNThhYjBhNDI1MDVhMGQ2YmI4IiwiaWQiOiI2NDAwNjY4YTlmODY3MTEwZTk4ZDk2MTkiLCJ1c2VySWQiOiI2NDAwNjY4YTlmODY3MTEwZTk4ZDk2MTkiLCJfaWQiOiI2NDAwNjY4YTlmODY3MTEwZTk4ZDk2MTkiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJjaGVucWlAYmlnY3J1aXNlLmNuIiwidXNlcm5hbWUiOm51bGwsInVuaW9uaWQiOm51bGwsIm9wZW5pZCI6bnVsbCwiY2xpZW50SWQiOiI2MjI4MDk5NmVlN2QyZDE0MTRiODcwYjMifSwidXNlcnBvb2xfaWQiOiI2MjI4MDk5NmVlN2QyZDE0MTRiODcwYjMiLCJhdWQiOiI2MjMxNTI1OGFiMGE0MjUwNWEwZDZiYjgiLCJleHAiOjE3Mjk1ODMyMzgsImlhdCI6MTcyODM3MzYzOCwiaXNzIjoiaHR0cHM6Ly9ob29rcy5hdXRoaW5nLmNuL29pZGMifQ.kySdvF3C4erhyRILgaBiGAp00agjT4IEMm5S0eASrgs`
 const recorderManager = wx.getRecorderManager();
 const fs = wx.getFileSystemManager();
-
+const innerAudioContext = wx.createInnerAudioContext();
 
 Page({
   socket: wx.connectSocket({
@@ -14,17 +14,31 @@ Page({
     isReplying: false,
     list: [],
     info: {},
+    scrollTop: 0,
+    isPlaying: false
 
   },
   onLoad() {
-
     this.initSocket()
     this.initRecorder()
+    this.initAudio()
   },
   onUnload() {
     this.socket.close()
   },
 
+  initAudio() {
+    innerAudioContext.onPlay(() => {
+      this.setData({
+        isPlaying: true
+      })
+    })
+    innerAudioContext.onEnded(() => {
+      this.setData({
+        isPlaying: false
+      })
+    })
+  },
   initSocket() {
     this.socket.onOpen(() => {
       console.log('socket onOpen')
@@ -41,19 +55,42 @@ Page({
         list
       } = this.data
       data.content = data.content.replaceAll('\n', '<br/>')
-      this.setData({
-        list: [...list, data]
-      })
+
       if (command === 'init') {
         wx.hideLoading()
         this.setData({
-          info: data
+          info: data,
+          list: [...list, {
+            type: 'left',
+            key: list.length,
+            ...data
+          }]
         })
       } else if (command === 'chat') {
-        console.log(333)
+        data.originContent = data.originContent.replaceAll('\n', '<br/>')
+        const {
+          audio,
+          content,
+          originContent,
+        } = data
+
         this.setData({
-          isReplying: false
-        })
+          isReplying: false,
+          list: [...list, {
+            content: originContent,
+            key: list.length,
+            type: "right"
+          }, {
+            content,
+            audio,
+            key: list.length + 1,
+            type: 'left'
+          }]
+        }, this.scrollBottom)
+      }
+
+      if (data.audio) {
+        this.playAudio(data.audio)
       }
     })
 
@@ -93,10 +130,11 @@ Page({
         filePath: res.tempFilePath,
         encoding: 'base64',
         success: (result) => {
-          console.log(3333, result.data)
+
           this.setData({
             isReplying: true
-          })
+          }, this.scrollBottom)
+
           this.socket.send({
             data: JSON.stringify({
               event: "chat",
@@ -144,6 +182,7 @@ Page({
     if (isReplying) {
       return console.warn('正在回复中...')
     }
+    innerAudioContext.stop()
     this.setData({
       isInputIng: true,
     })
@@ -164,6 +203,7 @@ Page({
     wx.showLoading({
       title: '连接中...',
     })
+    innerAudioContext.stop()
     this.setData({
       info: {},
       list: []
@@ -180,5 +220,33 @@ Page({
       },
       fail: err => console.error('send init fail', err)
     })
+  },
+
+  scrollBottom() {
+    const query = wx.createSelectorQuery();
+    query.select('.index-scroll-inner').boundingClientRect(rect => {
+      this.setData({
+        scrollTop: rect.height
+      });
+    }).exec();
+  },
+
+  handlePlayAudio(e) {
+    const {
+      isPlaying
+    } = this.data
+    if (isPlaying) {
+      wx.showToast({
+        title: '有音频正在播放,请等待播放完毕再点击',
+        icon: 'none'
+      })
+      return
+    }
+    this.playAudio(e.currentTarget.dataset.item.audio)
+  },
+
+  playAudio(file) {
+    innerAudioContext.src = file
+    innerAudioContext.play();
   }
 })
