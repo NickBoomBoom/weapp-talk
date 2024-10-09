@@ -1,5 +1,6 @@
 // index.js 
-const WEB_SOCKET_URL = 'ws://localhost:3000'
+const WEB_SOCKET_URL = 'wss://kidtalk.tltr.top/ws/'
+// const WEB_SOCKET_URL = 'ws://localhost:3000'
 const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cGRhdGVkX2F0IjoiMjAyNC0xMC0wOFQwNzo0NjoxMy44MDdaIiwiYWRkcmVzcyI6eyJjb3VudHJ5IjpudWxsLCJwb3N0YWxfY29kZSI6bnVsbCwicmVnaW9uIjpudWxsLCJmb3JtYXR0ZWQiOm51bGx9LCJwaG9uZV9udW1iZXJfdmVyaWZpZWQiOmZhbHNlLCJwaG9uZV9udW1iZXIiOm51bGwsImxvY2FsZSI6bnVsbCwiem9uZWluZm8iOm51bGwsImJpcnRoZGF0ZSI6bnVsbCwiZ2VuZGVyIjoiVSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJlbWFpbCI6ImNoZW5xaUBiaWdjcnVpc2UuY24iLCJ3ZWJzaXRlIjpudWxsLCJwaWN0dXJlIjoiaHR0cHM6Ly9maWxlcy5hdXRoaW5nLmNvL2F1dGhpbmctY29uc29sZS9kZWZhdWx0LXVzZXItYXZhdGFyLnBuZyIsInByb2ZpbGUiOm51bGwsInByZWZlcnJlZF91c2VybmFtZSI6bnVsbCwibmlja25hbWUiOm51bGwsIm1pZGRsZV9uYW1lIjpudWxsLCJmYW1pbHlfbmFtZSI6bnVsbCwiZ2l2ZW5fbmFtZSI6bnVsbCwibmFtZSI6bnVsbCwic3ViIjoiNjQwMDY2OGE5Zjg2NzExMGU5OGQ5NjE5IiwiZXh0ZXJuYWxfaWQiOm51bGwsInVuaW9uaWQiOm51bGwsInVzZXJuYW1lIjpudWxsLCJkYXRhIjp7InR5cGUiOiJ1c2VyIiwidXNlclBvb2xJZCI6IjYyMjgwOTk2ZWU3ZDJkMTQxNGI4NzBiMyIsImFwcElkIjoiNjIzMTUyNThhYjBhNDI1MDVhMGQ2YmI4IiwiaWQiOiI2NDAwNjY4YTlmODY3MTEwZTk4ZDk2MTkiLCJ1c2VySWQiOiI2NDAwNjY4YTlmODY3MTEwZTk4ZDk2MTkiLCJfaWQiOiI2NDAwNjY4YTlmODY3MTEwZTk4ZDk2MTkiLCJwaG9uZSI6bnVsbCwiZW1haWwiOiJjaGVucWlAYmlnY3J1aXNlLmNuIiwidXNlcm5hbWUiOm51bGwsInVuaW9uaWQiOm51bGwsIm9wZW5pZCI6bnVsbCwiY2xpZW50SWQiOiI2MjI4MDk5NmVlN2QyZDE0MTRiODcwYjMifSwidXNlcnBvb2xfaWQiOiI2MjI4MDk5NmVlN2QyZDE0MTRiODcwYjMiLCJhdWQiOiI2MjMxNTI1OGFiMGE0MjUwNWEwZDZiYjgiLCJleHAiOjE3Mjk1ODMyMzgsImlhdCI6MTcyODM3MzYzOCwiaXNzIjoiaHR0cHM6Ly9ob29rcy5hdXRoaW5nLmNuL29pZGMifQ.kySdvF3C4erhyRILgaBiGAp00agjT4IEMm5S0eASrgs`
 const recorderManager = wx.getRecorderManager();
 const fs = wx.getFileSystemManager();
@@ -182,9 +183,11 @@ Page({
     if (isReplying) {
       return console.warn('正在回复中...')
     }
+
     innerAudioContext.stop()
     this.setData({
       isInputIng: true,
+      isPlaying: false
     })
     const options = {
       duration: 600000, // 最大值 600000 (10分钟)
