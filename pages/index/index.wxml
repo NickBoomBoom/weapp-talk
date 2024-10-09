@@ -1,27 +1,29 @@
-<!--index.wxml-->
 <view class="index">
   <view class="index-header">
     <view>
-      当前会话id: {{ list[0].sessionId}}
+      当前会话id: {{ info.sessionId}}
     </view>
-    <view class="index-header-btn" bind:tap="reset">开启新对话</view>
+    <view wx:if="{{info.sessionId}}" class="index-header-btn" bind:tap="reset">开启新对话</view>
   </view>
-  <scroll-view class="index-scroll">
-    <view wx:for="{{list}}" wx:key="*this" class="item">
-      <text class='item-role'>
-      </text>
-      <view class='item-content'>
-        {{item.content}}
-        <view class="item-play">
-          播放按钮
-        </view>
+  <view class="index-scroll">
+    <scroll-view scroll-y class="index-scroll-inneer">
+      <view class="item" wx:for="{{list}}" wx:key="*this">
+        <rich-text nodes="{{item.content}}">
+        </rich-text>
+        <image class="item-play" src="../../images/play.png" mode="widthFix" />
       </view>
-    </view>
-  </scroll-view>
+
+      <view wx:if="{{isReplying}}" class='replying'>
+        机器人正在回复...
+      </view>
+
+
+    </scroll-view>
+  </view>
 
   <view class="index-footer">
-    <button bind:touchstart="handleStart" bind:touchend="handleStop">
-      {{isIng ?'录音中...':'开始录音'}}
+    <button bind:touchstart="handleStart" bind:touchend="handleStop" disabled="{{isReplying}}">
+      {{isInputIng ?'对话中...':'开始对话'}}
     </button>
   </view>
 </view>

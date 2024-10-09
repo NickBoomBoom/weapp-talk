@@ -11,13 +11,13 @@ Page({
   }),
   data: {
     isInputIng: false,
+    isReplying: false,
     list: [],
+    info: {},
+
   },
   onLoad() {
-    wx.showLoading({
-      title: '连接中...',
 
-    })
     this.initSocket()
     this.initRecorder()
   },
@@ -26,21 +26,9 @@ Page({
   },
 
   initSocket() {
-    console.log(5555, this.socket)
     this.socket.onOpen(() => {
       console.log('socket onOpen')
-      this.socket.send({
-        data: JSON.stringify({
-          event: "init",
-          data: {
-            token
-          }
-        }),
-        success: res => {
-          console.log('send init', res)
-        },
-        fail: err => console.error('send init fail', err)
-      })
+      this.reset()
     })
 
     this.socket.onMessage((res) => {
@@ -52,13 +40,20 @@ Page({
       const {
         list
       } = this.data
+      data.content = data.content.replaceAll('\n', '<br/>')
       this.setData({
         list: [...list, data]
       })
       if (command === 'init') {
         wx.hideLoading()
+        this.setData({
+          info: data
+        })
       } else if (command === 'chat') {
         console.log(333)
+        this.setData({
+          isReplying: false
+        })
       }
     })
 
@@ -91,11 +86,31 @@ Page({
         isInputIng: false
       })
       console.log('recorder stop', res)
+      const {
+        info
+      } = this.data
       fs.readFile({
         filePath: res.tempFilePath,
         encoding: 'base64',
-        success(result) {
+        success: (result) => {
           console.log(3333, result.data)
+          this.setData({
+            isReplying: true
+          })
+          this.socket.send({
+            data: JSON.stringify({
+              event: "chat",
+              data: {
+                token,
+                content: result.data,
+                sessionId: info.sessionId
+              }
+            }),
+            success: res => {
+              console.log('send chat', res)
+            },
+            fail: err => console.error('send chat fail', err)
+          })
         }
       })
     })
@@ -123,15 +138,21 @@ Page({
     })
   },
   handleStart() {
+    const {
+      isReplying
+    } = this.data
+    if (isReplying) {
+      return console.warn('正在回复中...')
+    }
     this.setData({
-      isInputIng: true
+      isInputIng: true,
     })
     const options = {
       duration: 600000, // 最大值 600000 (10分钟)
       sampleRate: 44100, // 采样率
       numberOfChannels: 1, // 录音通道数
       encodeBitRate: 192000, // 编码码率
-      format: 'mp3',
+      format: 'wav',
       frameSize: 50, //	指定帧大小，单位 KB。传入 frameSize 后，每录制指定帧大小的内容后，会回调录制的文件内容，不指定则不会回调。暂仅支持 mp3、pcm 格式。
     }
     recorderManager.start(options)
@@ -140,6 +161,24 @@ Page({
     recorderManager.stop()
   },
   reset() {
-
+    wx.showLoading({
+      title: '连接中...',
+    })
+    this.setData({
+      info: {},
+      list: []
+    })
+    this.socket.send({
+      data: JSON.stringify({
+        event: "init",
+        data: {
+          token
+        }
+      }),
+      success: res => {
+        console.log('send init', res)
+      },
+      fail: err => console.error('send init fail', err)
+    })
   }
 })

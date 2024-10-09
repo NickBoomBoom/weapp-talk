@@ -3,7 +3,8 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 0 20rpx;
+  padding: 0 30rpx 0;
+  overflow: hidden;
 }
 
 .index-header {
@@ -15,34 +16,58 @@
 
 .index-header-btn {
   margin-left: 20rpx;
-  background-color: skyblue;
+  padding: 6rpx 14rpx;
+  background-color: #74b9ff;
+  color: white;
+  font-size: 23rpx;
+  border-radius: 4rpx;
 }
 
 .index-scroll {
   flex: 1;
   background-color: #fefefe;
+  overflow: scroll;
 }
 
-.item {}
+.index-scroll-inner {
+  height: 100%;
+}
 
-.item-role {
-  display: inline-block;
+.item {
+  margin-bottom: 30rpx;
+  font-size: 28rpx;
+  line-height: 32rpx;
+  text-indent: 40rpx;
+  position: relative;
+}
+
+.item::before {
+  content: "";
+  position: absolute;
+  top: 0rpx;
+  left: 0;
+  display: block;
   width: 30rpx;
   height: 30rpx;
-  background-color: red;
+  background-color: #ffc312;
   border-radius: 50%;
 }
 
-.item-content {
-  display: inline;
-}
-
 .item-play {
-  display: inline;
+  height: 40rpx !important;
+  width: 40rpx !important;
+  position: absolute;
+  bottom: -10rpx;
+  right: 0;
 }
 
+.replying {
+  font-size: 28rpx;
+  color: gray;
+}
 
 .index-footer {
+  height: 50rpx;
   padding-bottom: constant(safe-area-inset-bottom);
   /*兼容 IOS<11.2*/
   padding-bottom: env(safe-area-inset-bottom);
